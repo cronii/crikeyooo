@@ -8,8 +8,12 @@
 for scripts to run, need config.json with the following
 ```
 {
-  "rpc": "...",
-  "pkey": "..."
+  "mainnetRpc": "...",
+  "goerliRpc": "...",
+  "address1": "...",
+  "pkey1": "...",
+  "address2": "...",
+  "pkey2": "..."
 }
 ```
 
