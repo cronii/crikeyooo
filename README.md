@@ -5,15 +5,19 @@
 
 ## init
 
-for scripts to run, need config.json with the following
+for proof of concept scripts to run, need config.json with the following. both accounts need eth on goerli
 ```
 {
   "mainnetRpc": "...",
   "goerliRpc": "...",
-  "address1": "...",
-  "pkey1": "...",
-  "address2": "...",
-  "pkey2": "..."
+  "user1": {
+    "address": "...",
+    "pkey": "...",
+  },
+  "user2": {
+    "address": "...",
+    "pkey": "...",
+  }
 }
 ```
 
