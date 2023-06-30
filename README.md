@@ -50,4 +50,4 @@ for proof of concept scripts to run, need config.json with the following. both a
 - Frontend
 
 ## lpConduit
-- Does not seem functional via PoC
+- need to deploy an lpConduit contract
