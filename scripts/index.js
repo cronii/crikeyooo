@@ -169,7 +169,6 @@ const { user1, user2 } = CONFIG;
     [MINT_AMBIENT_QUOTE_LP, ETH, USDC, POOL_IDX_GOERLI, 0, 0, usdcValue, 184467440737095516160000n, 26087635650665562771554304, 0n, user2.address]);
 
     // console.log(input);
-
     // await usdcPoolView.mintAmbientQuote(0.1, [0.0000, 1]);
     // await crocUser1.poolEth(USDC).mintAmbientBase(0.0001, [0.0001, 2])
     // await crocUser1.poolEth(USDC).mintAmbientQuote(0.1, [0.0001, 2])

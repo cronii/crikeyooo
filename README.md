@@ -1,7 +1,10 @@
 # crikeyooo
 
-/scripts - local run scripts to test contract
-/sample - sample contracts for quick reference, to be deleted
+`/scripts` - local run scripts to test contracts
+
+## requirements
+- `foundry`
+- `node v18.16.0`
 
 ## init
 

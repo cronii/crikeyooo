@@ -5,7 +5,7 @@ import "CrocSwap-protocol/libraries/PoolSpecs.sol";
 import "CrocSwap-protocol/interfaces/ICrocLpConduit.sol";
 import "solmate/tokens/ERC20.sol";
 
-contract CrocLpErc20 is ERC20, ICrocLpConduit {
+contract CrikeyLpConduit is ERC20, ICrocLpConduit {
     bytes32 public immutable poolHash;
     address public immutable baseToken;
     address public immutable quoteToken;
