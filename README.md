@@ -48,3 +48,6 @@ for proof of concept scripts to run, need config.json with the following. both a
 - Vesting Rewards Contract
   - Simple contract to vest team token rewards over a period of time
 - Frontend
+
+## lpConduit
+- Does not seem functional via PoC
