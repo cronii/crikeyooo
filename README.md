@@ -53,6 +53,12 @@ for proof of concept scripts to run, need config.json with the following. both a
 - Frontend
 
 ## TODO
-- investigate burn function for liquidity withdrawal
-  - does the user send LP tokens to 
-- research concentrated liquidity LP tokens
+- [x] CrikeyToken contract
+- [x] CrikeyAmbientLpConduit contract
+- [x] lpConduit proof of concept scripts
+- [ ] CrikeyConcentratedLpConduit contract
+- [ ] CrikeyRewards contract
+- [ ] LinearVesting contract
+- [ ] Contract tests
+- [ ] Frontend
+- [ ] Frontend deployment

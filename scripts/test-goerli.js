@@ -19,7 +19,6 @@ const { formatEther, formatUnits } = ethers.utils;
 
 // goerli constants
 const ETH = ethers.constants.AddressZero;
-const USDC = '0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C';
 const CROCSWAP_ADDRESS = '0xfAfcD1f5530827e7398B6D3C509f450b1b24a209';
 const TEST_TOKEN = '0xa6024a169c2fc6bfd0feabee150b86d268aaf4ce';
 const TEST_TOKEN_LP_CONDUIT = '0x4111edb29044B41F3a0EE318B417899086c613f3';
@@ -124,8 +123,8 @@ const { user1, user2 } = CONFIG;
 
     // approve LP tokens for transfer
     const lpConduitContract = new ethers.Contract(TEST_TOKEN_LP_CONDUIT, ERC20ABI, provider);
-    // const lpConduitBalance = await lpConduitContract.balanceOf(user1.address);
-    await lpConduitContract.connect(walletUser).approve(CROCSWAP_ADDRESS, parseUnits('1', 18));
+    const lpConduitBalance = await lpConduitContract.balanceOf(user1.address);
+    // await lpConduitContract.connect(walletUser).approve(CROCSWAP_ADDRESS, parseUnits('1', 18));
 
     // burn ambient LP
     const input = encodeAbiParameters([
@@ -140,7 +139,7 @@ const { user1, user2 } = CONFIG;
       { name: 'limitHigher', type: 'uint128' },
       { name: 'reserveFlags', type: 'uint8' },
       { name: 'lpConduit', type: 'address' }],
-    [BURN_AMBIENT_LIQ_LP, ETH, TEST_TOKEN, POOL_IDX_GOERLI, 0, 0, 100000000000000000000000000n, 0n, 126087635650665562771554304n, 0n, TEST_TOKEN_LP_CONDUIT]);
+    [BURN_AMBIENT_LIQ_LP, ETH, TEST_TOKEN, POOL_IDX_GOERLI, 0, 0, lpConduitBalance, 0n, 126087635650665562771554304n, 0n, TEST_TOKEN_LP_CONDUIT]);
 
     const { request } = await publicClient.simulateContract({
       address: CROCSWAP_ADDRESS,
