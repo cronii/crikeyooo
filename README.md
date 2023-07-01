@@ -24,7 +24,7 @@ for proof of concept scripts to run, need config.json with the following. both a
 }
 ```
 
-## TODO
+## Research
 - Proof of Concept Scripts -- IN PROGRESS
   - Need to see if LP are transferable on mint/burn
   - If not, team is working on a way to trasfer
@@ -52,5 +52,7 @@ for proof of concept scripts to run, need config.json with the following. both a
   - Simple contract to vest team token rewards over a period of time
 - Frontend
 
-## lpConduit
-- need to deploy an lpConduit contract
+## TODO
+- investigate burn function for liquidity withdrawal
+  - does the user send LP tokens to 
+- research concentrated liquidity LP tokens
