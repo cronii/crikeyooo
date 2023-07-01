@@ -140,7 +140,7 @@ const { user1, user2 } = CONFIG;
       { name: 'limitHigher', type: 'uint128' },
       { name: 'reserveFlags', type: 'uint8' },
       { name: 'lpConduit', type: 'address' }],
-    [BURN_AMBIENT_LIQ_LP, ETH, TEST_TOKEN, POOL_IDX_GOERLI, 0, 0, 1000000000000, 0n, 126087635650665562771554304n, 0n, TEST_TOKEN_LP_CONDUIT]);
+    [BURN_AMBIENT_LIQ_LP, ETH, TEST_TOKEN, POOL_IDX_GOERLI, 0, 0, 100000000000000000000000000n, 0n, 126087635650665562771554304n, 0n, TEST_TOKEN_LP_CONDUIT]);
 
     const { request } = await publicClient.simulateContract({
       address: CROCSWAP_ADDRESS,
