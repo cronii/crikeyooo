@@ -25,8 +25,9 @@ contract CrikeyRangeLpConduit is ERC20, ICrocLpConduit {
         override
         returns (bool)
     {
+        int256 tickRange = abs(upperTick - lowerTick);
         require(pool == poolHash, "Wrong pool");
-        require(lowerTick != 0 && upperTick != 0, "Non-Range LP Deposit");
+        require(tickRange > 0, "Non-Range LP Deposit");
         _mint(sender, seeds);
         return true;
     }
@@ -36,9 +37,14 @@ contract CrikeyRangeLpConduit is ERC20, ICrocLpConduit {
         override
         returns (bool)
     {
+        int256 tickRange = abs(upperTick - lowerTick);
         require(pool == poolHash, "Wrong pool");
-        require(lowerTick != 0 && upperTick != 0, "Non-Range LP Deposit");
+        require(tickRange > 0, "Non-Range LP Deposit");
         _burn(sender, seeds);
         return true;
+    }
+
+    function abs(int256 x) private pure returns (int256) {
+        return x >= 0 ? x : -x;
     }
 }
