@@ -11,15 +11,8 @@ contract CrikeyRangeLpConduit is ERC20, ICrocLpConduit {
     address public immutable quoteToken;
     uint256 public immutable poolType;
 
-    constructor(
-        address base,
-        address quote,
-        uint256 poolIdx
-    ) ERC20("Croc Range LP ERC20 Token", "LP-CrocRange", 18) {
-        require(
-            quote != address(0) && base != quote && quote > base,
-            "Invalid Token Pair"
-        );
+    constructor(address base, address quote, uint256 poolIdx) ERC20("Croc Range LP ERC20 Token", "LP-CrocRange", 18) {
+        require(quote != address(0) && base != quote && quote > base, "Invalid Token Pair");
 
         baseToken = base;
         quoteToken = quote;
@@ -27,28 +20,22 @@ contract CrikeyRangeLpConduit is ERC20, ICrocLpConduit {
         poolHash = PoolSpecs.encodeKey(base, quote, poolIdx);
     }
 
-    function depositCrocLiq(
-        address sender,
-        bytes32 pool,
-        int24 lowerTick,
-        int24 upperTick,
-        uint128 seeds,
-        uint64
-    ) public override returns (bool) {
+    function depositCrocLiq(address sender, bytes32 pool, int24 lowerTick, int24 upperTick, uint128 seeds, uint64)
+        public
+        override
+        returns (bool)
+    {
         require(pool == poolHash, "Wrong pool");
         require(lowerTick != 0 && upperTick != 0, "Non-Range LP Deposit");
         _mint(sender, seeds);
         return true;
     }
 
-    function withdrawCrocLiq(
-        address sender,
-        bytes32 pool,
-        int24 lowerTick,
-        int24 upperTick,
-        uint128 seeds,
-        uint64
-    ) public override returns (bool) {
+    function withdrawCrocLiq(address sender, bytes32 pool, int24 lowerTick, int24 upperTick, uint128 seeds, uint64)
+        public
+        override
+        returns (bool)
+    {
         require(pool == poolHash, "Wrong pool");
         require(lowerTick != 0 && upperTick != 0, "Non-Range LP Deposit");
         _burn(sender, seeds);
