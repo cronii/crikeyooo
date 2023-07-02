@@ -50,15 +50,25 @@ for proof of concept scripts to run, need config.json with the following. both a
   - Wrapper contract/function that takes raw ETH from user, buys Crikey with half, and then mints an ambient LP
 - Vesting Rewards Contract
   - Simple contract to vest team token rewards over a period of time
-- Frontend
 
 ## TODO
 - [x] CrikeyToken contract
 - [x] CrikeyAmbientLpConduit contract
-- [x] lpConduit proof of concept scripts
+- [x] Ambient lpConduit proof of concept scripts
 - [ ] CrikeyConcentratedLpConduit contract
+- [ ] Concentrated lpConduit proof of concept scripts
 - [ ] CrikeyRewards contract
 - [ ] LinearVesting contract
+- [ ] FutureRewards contract
 - [ ] Contract tests
 - [ ] Frontend
-- [ ] Frontend deployment
+  - [ ] Ambient LP Staking Interface
+  - [ ] Concentrated LP Staking Interface
+  - [ ] APY Calculations
+  - [ ] ETH -> Crikey "Zap"
+  - [ ] Frontend deployment
+- [ ] Tokenomics
+- [ ] Airdrop distribution plan
+- [ ] Social
+- [ ] Ambient Team Coordination
+- [ ] Deployment steps

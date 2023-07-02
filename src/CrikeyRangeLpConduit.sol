@@ -5,7 +5,7 @@ import "CrocSwap-protocol/libraries/PoolSpecs.sol";
 import "CrocSwap-protocol/interfaces/ICrocLpConduit.sol";
 import "solmate/tokens/ERC20.sol";
 
-contract CrikeyLpConduit is ERC20, ICrocLpConduit {
+contract CrikeyRangeLpConduit is ERC20, ICrocLpConduit {
     bytes32 public immutable poolHash;
     address public immutable baseToken;
     address public immutable quoteToken;
@@ -15,11 +15,7 @@ contract CrikeyLpConduit is ERC20, ICrocLpConduit {
         address base,
         address quote,
         uint256 poolIdx
-    ) ERC20("Croc Ambient LP ERC20 Token", "LP-CrocAmb", 18) {
-        // CrocSwap protocol uses 0x0 for native ETH, so it's possible that base
-        // token could be 0x0, which means the pair is against native ETH. quote
-        // will never be 0x0 because native ETH will always be the base side of
-        // the pair.
+    ) ERC20("Croc Range LP ERC20 Token", "LP-CrocRange", 18) {
         require(
             quote != address(0) && base != quote && quote > base,
             "Invalid Token Pair"
@@ -40,7 +36,7 @@ contract CrikeyLpConduit is ERC20, ICrocLpConduit {
         uint64
     ) public override returns (bool) {
         require(pool == poolHash, "Wrong pool");
-        require(lowerTick == 0 && upperTick == 0, "Non-Ambient LP Deposit");
+        require(lowerTick != 0 && upperTick != 0, "Non-Range LP Deposit");
         _mint(sender, seeds);
         return true;
     }
@@ -54,7 +50,7 @@ contract CrikeyLpConduit is ERC20, ICrocLpConduit {
         uint64
     ) public override returns (bool) {
         require(pool == poolHash, "Wrong pool");
-        require(lowerTick == 0 && upperTick == 0, "Non-Ambient LP Deposit");
+        require(lowerTick != 0 && upperTick != 0, "Non-Range LP Deposit");
         _burn(sender, seeds);
         return true;
     }
