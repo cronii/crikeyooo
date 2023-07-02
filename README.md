@@ -70,5 +70,5 @@ for proof of concept scripts to run, need config.json with the following. both a
 - [ ] Tokenomics
 - [ ] Airdrop distribution plan
 - [ ] Social
-- [ ] Ambient Team Coordination
+- [ ] Ambient team coordination
 - [ ] Deployment steps
