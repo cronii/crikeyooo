@@ -47,7 +47,7 @@ for proof of concept scripts to run, need config.json with the following. both a
 - Concentrated Liq Crikey/Eth Staking Rewards Contract
   - Same as above, but for concentrated liqudity positions
 - "Zap" Eth -> Crikey/Eth LP Contract/function
-  - Wrapper contract/function that takes raw ETH from user, buys Crikey with half, and then mints an ambient LP
+  - Wrapper contract/function that takes raw ETH from user, buys Crikey with half, and then mints an amtwbient LP
 - Vesting Rewards Contract
   - Simple contract to vest team token rewards over a period of time
 
@@ -57,18 +57,26 @@ for proof of concept scripts to run, need config.json with the following. both a
 - [x] Ambient lpConduit proof of concept scripts
 - [ ] CrikeyConcentratedLpConduit contract
 - [ ] Concentrated lpConduit proof of concept scripts
+- [ ] lpConduit contract address security checks
 - [ ] CrikeyRewards contract
-- [ ] LinearVesting contract
+- [x] LinearVester contract
 - [ ] FutureRewards contract
 - [ ] Contract tests
+- [ ] ETH -> Crikey "Zap"
 - [ ] Frontend
   - [ ] Ambient LP Staking Interface
   - [ ] Concentrated LP Staking Interface
   - [ ] APY Calculations
-  - [ ] ETH -> Crikey "Zap"
-  - [ ] Frontend deployment
+  - [x] Frontend deployment
+  - [x] Vercel
 - [ ] Tokenomics
 - [ ] Airdrop distribution plan
 - [ ] Social
-- [ ] Ambient team coordination
+- [ ] Ambient team coordination (?)
 - [ ] Deployment steps
+
+## Questions
+- Can LP token recipients redeem for the underlying? Will this work for range LP tokens?
+- Is there a way to accurately bookkeep for range LP? Should positions be indexed by amount of ETH deposited?
+- What is the best token emmission rate where stakers are not quickly dilluted?
+- What was arbinyan's profit?

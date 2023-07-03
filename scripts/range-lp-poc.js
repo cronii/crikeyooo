@@ -92,6 +92,7 @@ const { user1 } = CONFIG;
 
     // console.log(await userPosition.queryRangePos(-640000, -320000));
     console.log(await lpConduitPosition.queryRangePos(-640000, -320000));
+    console.log(await testPoolView.spotTick())
 
     // const initUserBalance = await userPosition.queryRangePos(-640000, -320000);
     // console.log(initUserBalance.liq);
@@ -194,7 +195,7 @@ const { user1 } = CONFIG;
       { name: 'limitHigher', type: 'uint128' },
       { name: 'reserveFlags', type: 'uint8' },
       { name: 'lpConduit', type: 'address' }],
-    [MINT_CONC_BASE, ETH, TEST_TOKEN, POOL_IDX_GOERLI, -640000, -80000, liq, encodedLowerLimit, encodedUpperLimit, 0n, TEST_TOKEN_RANGE_LP_CONDUIT]);
+    [MINT_CONC_BASE, ETH, TEST_TOKEN, POOL_IDX_GOERLI, -640000, 80000, liq, encodedLowerLimit, encodedUpperLimit, 0n, TEST_TOKEN_RANGE_LP_CONDUIT]);
 
     const { request: mintRequest } = await publicClient.simulateContract({
       address: CROCSWAP_ADDRESS,
@@ -213,30 +214,30 @@ const { user1 } = CONFIG;
     // await lpConduitContract.connect(walletUser).approve(CROCSWAP_ADDRESS, parseUnits('100000000', 18));
 
     // burn range LP
-    const burnInput = encodeAbiParameters([
-      { name: 'code', type: 'uint8' },
-      { name: 'base', type: 'address' },
-      { name: 'quote', type: 'address' },
-      { name: 'poolIdx', type: 'uint256' },
-      { name: 'bidTick', type: 'int24' },
-      { name: 'askTick', type: 'int24' },
-      { name: 'liq', type: 'uint128' },
-      { name: 'limitLower', type: 'uint128' },
-      { name: 'limitHigher', type: 'uint128' },
-      { name: 'reserveFlags', type: 'uint8' },
-      { name: 'lpConduit', type: 'address' }],
-    [BURN_CONCENTRATED, ETH, TEST_TOKEN, POOL_IDX_GOERLI, -640000, -320000, 213096142761584080156672n, encodedLowerLimit, encodedUpperLimit, 0n, TEST_TOKEN_RANGE_LP_CONDUIT]);
+    // const burnInput = encodeAbiParameters([
+    //   { name: 'code', type: 'uint8' },
+    //   { name: 'base', type: 'address' },
+    //   { name: 'quote', type: 'address' },
+    //   { name: 'poolIdx', type: 'uint256' },
+    //   { name: 'bidTick', type: 'int24' },
+    //   { name: 'askTick', type: 'int24' },
+    //   { name: 'liq', type: 'uint128' },
+    //   { name: 'limitLower', type: 'uint128' },
+    //   { name: 'limitHigher', type: 'uint128' },
+    //   { name: 'reserveFlags', type: 'uint8' },
+    //   { name: 'lpConduit', type: 'address' }],
+    // [BURN_CONCENTRATED, ETH, TEST_TOKEN, POOL_IDX_GOERLI, -640000, -320000, 213096142761584080156672n, encodedLowerLimit, encodedUpperLimit, 0n, TEST_TOKEN_RANGE_LP_CONDUIT]);
 
-    const { request: burnRequest } = await publicClient.simulateContract({
-      address: CROCSWAP_ADDRESS,
-      abi: CROCSWAP_ABI,
-      functionName: 'userCmd',
-      args: [LP_PROXY, burnInput],
-      value: 0,
-      account
-    });
+    // const { request: burnRequest } = await publicClient.simulateContract({
+    //   address: CROCSWAP_ADDRESS,
+    //   abi: CROCSWAP_ABI,
+    //   functionName: 'userCmd',
+    //   args: [LP_PROXY, burnInput],
+    //   value: 0,
+    //   account
+    // });
 
-    await walletClient.writeContract(burnRequest);
+    // await walletClient.writeContract(burnRequest);
   } catch (err) {
     console.error(err);
   }

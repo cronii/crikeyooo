@@ -13,58 +13,54 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-/*
-Simple linear vesting with an end date. 50% after half of time, 70% after 70% etc.
-*/
+// Simple linear vesting with cliff. Linear vesting after cliff timestamp is reached
 contract LinearVester {
-  IERC20 public immutable lockedToken;
-  address immutable public beneficiary;
+    IERC20 public immutable lockedToken;
+    address public immutable beneficiary;
 
-  bool public locked = false;
-  uint public startTimestamp;
-  uint public endTimestamp;
-  uint public startingAmount;
-  uint public withdrawnAmount;
+    bool public locked = false;
+    uint256 public startTimestamp;
+    uint256 public endTimestamp;
+    uint256 public startingAmount;
+    uint256 public withdrawnAmount;
 
-  constructor(IERC20 token) {
-    lockedToken = token;
-    beneficiary = msg.sender;
-  }
-
-  function createLockup(uint256 amount, uint256 _endTimestamp) external {
-    require(msg.sender == beneficiary);
-    require(!locked);
-    require(lockedToken.transferFrom(msg.sender, address(this), amount));
-    startingAmount = amount;
-    endTimestamp = _endTimestamp;
-    startTimestamp = block.timestamp;
-    require(startTimestamp < endTimestamp);
-    locked = true;
-  }
-
-  function getUnlocked() public view returns (uint256) {
-    if(block.timestamp >= endTimestamp) {
-      return startingAmount;
+    constructor(IERC20 token) {
+        lockedToken = token;
+        beneficiary = msg.sender;
     }
-    uint duration = endTimestamp - startTimestamp;
-    uint passed = block.timestamp - startTimestamp;
-    uint vestedAmount = startingAmount*passed/duration;
-    return vestedAmount;
-  }
 
-  function withdrawVested() external {
-    require(msg.sender == beneficiary);
-    uint toWithdraw;
-    if(block.timestamp >= endTimestamp) {
-      //vesting ended - everything
-      toWithdraw = lockedToken.balanceOf(address(this));
+    function createLockup(uint256 amount, uint256 _startTimestamp, uint256 _endTimestamp) external {
+        require(msg.sender == beneficiary);
+        require(!locked);
+        require(lockedToken.transferFrom(msg.sender, address(this), amount));
+        startingAmount = amount;
+        startTimestamp = _startTimestamp;
+        endTimestamp = _endTimestamp;
+        require(startTimestamp < endTimestamp);
+        locked = true;
     }
-    else {
-      toWithdraw = getUnlocked()-withdrawnAmount;
+
+    function getUnlocked() public view returns (uint256) {
+        if (block.timestamp >= endTimestamp) {
+            return startingAmount;
+        }
+        uint256 duration = endTimestamp - startTimestamp;
+        uint256 passed = block.timestamp - startTimestamp;
+        uint256 vestedAmount = startingAmount * passed / duration;
+        return vestedAmount;
     }
-    require(lockedToken.transfer(beneficiary, toWithdraw));
-    withdrawnAmount += toWithdraw;
-  }
+
+    function withdrawVested() external {
+        require(msg.sender == beneficiary);
+        uint256 toWithdraw;
+        if (block.timestamp >= endTimestamp) {
+            toWithdraw = lockedToken.balanceOf(address(this));
+        } else {
+            toWithdraw = getUnlocked() - withdrawnAmount;
+        }
+        require(lockedToken.transfer(beneficiary, toWithdraw));
+        withdrawnAmount += toWithdraw;
+    }
 }
 
 /* MIT License

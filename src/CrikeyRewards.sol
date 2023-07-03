@@ -186,9 +186,6 @@ contract CrikeyRewards is StakedTokenWrapper, Ownable {
             rewardPerTokenStored = rewardPerToken();
             uint64 blockTimestamp = uint64(block.timestamp);
             uint256 maxRewardSupply = rewardToken.balanceOf(address(this));
-            if (rewardToken == stakedToken) {
-                maxRewardSupply -= totalSupply;
-            }
             uint256 leftover = 0;
             if (blockTimestamp >= periodFinish) {
                 rewardRate = reward / duration;
@@ -206,10 +203,6 @@ contract CrikeyRewards is StakedTokenWrapper, Ownable {
 
     function withdrawReward() external onlyOwner {
         uint256 rewardSupply = rewardToken.balanceOf(address(this));
-        //ensure funds staked by users can't be transferred out
-        if (rewardToken == stakedToken) {
-            rewardSupply -= totalSupply;
-        }
         require(rewardToken.transfer(msg.sender, rewardSupply));
         rewardRate = 0;
         periodFinish = uint64(block.timestamp);

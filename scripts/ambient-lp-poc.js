@@ -156,4 +156,6 @@ const { user1, user2 } = CONFIG;
 })();
 
 // forge create CrikeyToken --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-args TestToken Test 18
-// forge create CrikeyLpConduit --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-args 0x0000000000000000000000000000000000000000 0xa6024a169c2fc6bfd0feabee150b86d268aaf4ce 36000
+// forge create CrikeyAmbientLpConduit --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-args 0x0000000000000000000000000000000000000000 0xa6024a169c2fc6bfd0feabee150b86d268aaf4ce 36000
+// cast send 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 --private-key=$PRIVATE_KEY "depositCrocLiq(address,bytes32,int24,int24,uint128,uint64)" 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 0xf14b97521d2ba8399ee7b9be53ec1eb470416373ed113505baff7e5a63825ced -- -640000 -320000 1000 10
+// cast send 0x5FC8d32690cc91D4c39d9d3abcBD16989F875707 --private-key=$PRIVATE_KEY "setAuthority(address)" 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
