@@ -30,13 +30,14 @@ contract LinearVester {
     }
 
     function createLockup(uint256 amount, uint256 _startTimestamp, uint256 _endTimestamp) external {
-        require(msg.sender == beneficiary);
-        require(!locked);
+        require(msg.sender == beneficiary, "UNAUTHORIZED");
+        require(!locked, "Already Locked");
+        require(lockedToken.balanceOf(msg.sender) >= amount, "Insufficient Balance");
         require(lockedToken.transferFrom(msg.sender, address(this), amount));
+        require(_startTimestamp < _endTimestamp, "Invalid Lock Period");
         startingAmount = amount;
         startTimestamp = _startTimestamp;
         endTimestamp = _endTimestamp;
-        require(startTimestamp < endTimestamp);
         locked = true;
     }
 
@@ -51,7 +52,7 @@ contract LinearVester {
     }
 
     function withdrawVested() external {
-        require(msg.sender == beneficiary);
+        require(msg.sender == beneficiary, "UNAUTHORIZED");
         uint256 toWithdraw;
         if (block.timestamp >= endTimestamp) {
             toWithdraw = lockedToken.balanceOf(address(this));

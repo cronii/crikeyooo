@@ -1,37 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-contract Ownable {
-    address public owner;
-
-    event OwnershipTransferred(address indexed user, address indexed newOwner);
-
-    constructor() {
-        owner = msg.sender;
-        emit OwnershipTransferred(address(0), owner);
-    }
-
-    /**
-     * @dev Throws if called by any account other than the owner.
-     */
-    modifier onlyOwner() virtual {
-        require(msg.sender == owner, "UNAUTHORIZED");
-        _;
-    }
-
-    /**
-     * @dev Leaves the contract without owner. It will not be possible to call
-     * `onlyOwner` functions anymore. Can only be called by the current owner.
-     *
-     * NOTE: Renouncing ownership will leave the contract without an owner,
-     * thereby removing any functionality that is only available to the owner.
-     */
-
-    function transferOwnership() public onlyOwner {
-        owner = address(0);
-        emit OwnershipTransferred(msg.sender, address(0));
-    }
-}
+import {Owned} from "solmate/auth/Owned.sol";
 
 interface IERC20 {
     function totalSupply() external view returns (uint256);
@@ -45,87 +15,40 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-contract StakedTokenWrapper {
-    uint256 public totalSupply;
-
-    mapping(address => uint256) private _balances;
+contract CrikeyRewards is Owned {
+    IERC20 public rewardToken;
     IERC20 public stakedToken;
 
-    event Staked(address indexed user, uint256 amount);
-    event Withdrawn(address indexed user, uint256 amount);
-
-    function balanceOf(address account) public view returns (uint256) {
-        return _balances[account];
-    }
-
-    string constant _transferErrorMessage = "staked token transfer failed";
-
-    function stakeFor(address forWhom, uint128 amount) public payable virtual {
-        IERC20 st = stakedToken;
-        if (st == IERC20(address(0))) {
-            //eth
-            unchecked {
-                totalSupply += msg.value;
-                _balances[forWhom] += msg.value;
-            }
-        } else {
-            require(msg.value == 0, "non-zero eth");
-            require(amount > 0, "Cannot stake 0");
-            require(st.transferFrom(msg.sender, address(this), amount), _transferErrorMessage);
-            unchecked {
-                totalSupply += amount;
-                _balances[forWhom] += amount;
-            }
-        }
-        emit Staked(forWhom, amount);
-    }
-
-    function withdraw(uint128 amount) public virtual {
-        require(amount <= _balances[msg.sender], "withdraw: balance is lower");
-        unchecked {
-            _balances[msg.sender] -= amount;
-            totalSupply = totalSupply - amount;
-        }
-        IERC20 st = stakedToken;
-        if (st == IERC20(address(0))) {
-            //eth
-            (bool success,) = msg.sender.call{value: amount}("");
-            require(success, "eth transfer failure");
-        } else {
-            require(stakedToken.transfer(msg.sender, amount), _transferErrorMessage);
-        }
-        emit Withdrawn(msg.sender, amount);
-    }
-}
-
-contract CrikeyRewards is StakedTokenWrapper, Ownable {
-    IERC20 public rewardToken;
     uint256 public rewardRate;
     uint64 public periodFinish;
     uint64 public lastUpdateTime;
     uint128 public rewardPerTokenStored;
+    uint256 public totalStaked;
 
     struct UserRewards {
         uint128 userRewardPerTokenPaid;
         uint128 rewards;
     }
 
+    mapping(address => uint256) public stakedBalance;
     mapping(address => UserRewards) public userRewards;
 
     event RewardAdded(uint256 reward);
     event RewardPaid(address indexed user, uint256 reward);
+    event Staked(address indexed user, uint256 amount);
+    event Withdrawn(address indexed user, uint256 amount);
 
-    constructor(IERC20 _rewardToken, IERC20 _stakedToken) {
+    constructor(IERC20 _rewardToken, IERC20 _stakedToken) Owned(msg.sender) {
         rewardToken = _rewardToken;
         stakedToken = _stakedToken;
     }
 
-    modifier updateReward(address account) {
+    modifier updateReward(address _account) {
         uint128 _rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = lastTimeRewardApplicable();
         rewardPerTokenStored = _rewardPerTokenStored;
-        userRewards[account].rewards = earned(account);
-        userRewards[account].userRewardPerTokenPaid = _rewardPerTokenStored;
+        userRewards[_account].rewards = earned(_account);
+        userRewards[_account].userRewardPerTokenPaid = _rewardPerTokenStored;
         _;
     }
 
@@ -135,40 +58,51 @@ contract CrikeyRewards is StakedTokenWrapper, Ownable {
     }
 
     function rewardPerToken() public view returns (uint128) {
-        uint256 totalStakedSupply = totalSupply;
-        if (totalStakedSupply == 0) {
+        if (totalStaked == 0) {
             return rewardPerTokenStored;
         }
         unchecked {
             uint256 rewardDuration = lastTimeRewardApplicable() - lastUpdateTime;
-            return uint128(rewardPerTokenStored + rewardDuration * rewardRate * 1e18 / totalStakedSupply);
+            return uint128(rewardPerTokenStored + rewardDuration * rewardRate * 1e18 / totalStaked);
         }
     }
 
-    function earned(address account) public view returns (uint128) {
+    function earned(address _account) public view returns (uint128) {
         unchecked {
             return uint128(
-                balanceOf(account) * (rewardPerToken() - userRewards[account].userRewardPerTokenPaid) / 1e18
-                    + userRewards[account].rewards
+                stakedBalance[_account] * (rewardPerToken() - userRewards[_account].userRewardPerTokenPaid) / 1e18
+                    + userRewards[_account].rewards
             );
         }
     }
 
-    function stake(uint128 amount) external payable {
-        stakeFor(msg.sender, amount);
+    function stake(uint128 _amount) external {
+        stakeFor(msg.sender, _amount);
     }
 
-    function stakeFor(address forWhom, uint128 amount) public payable override updateReward(forWhom) {
-        super.stakeFor(forWhom, amount);
+    function stakeFor(address forWhom, uint128 _amount) public virtual {
+        require(_amount > 0, "Cannot stake 0");
+        require(stakedToken.transferFrom(msg.sender, address(this), _amount), "Insufficient balance");
+        unchecked {
+            totalStaked += _amount;
+            stakedBalance[forWhom] += _amount;
+        }
+        emit Staked(forWhom, _amount);
     }
 
-    function withdraw(uint128 amount) public override updateReward(msg.sender) {
-        super.withdraw(amount);
+    function withdraw(uint128 _amount) public updateReward(msg.sender) {
+        require(_amount <= stakedBalance[msg.sender], "withdraw: balance is lower");
+        unchecked {
+            stakedBalance[msg.sender] -= _amount;
+            totalStaked = totalStaked - _amount;
+        }
+        require(stakedToken.transfer(msg.sender, _amount), "Error transfering reward balance");
+        emit Withdrawn(msg.sender, _amount);
     }
 
     function exit() external {
         getReward();
-        withdraw(uint128(balanceOf(msg.sender)));
+        withdraw(uint128(stakedBalance[msg.sender]));
     }
 
     function getReward() public updateReward(msg.sender) {
@@ -180,24 +114,24 @@ contract CrikeyRewards is StakedTokenWrapper, Ownable {
         }
     }
 
-    function setRewardParams(uint128 reward, uint64 duration) external onlyOwner {
+    function setRewardParams(uint128 _reward, uint64 _duration) external onlyOwner {
         unchecked {
-            require(reward > 0);
+            require(_reward > 0);
             rewardPerTokenStored = rewardPerToken();
             uint64 blockTimestamp = uint64(block.timestamp);
             uint256 maxRewardSupply = rewardToken.balanceOf(address(this));
             uint256 leftover = 0;
             if (blockTimestamp >= periodFinish) {
-                rewardRate = reward / duration;
+                rewardRate = _reward / _duration;
             } else {
                 uint256 remaining = periodFinish - blockTimestamp;
                 leftover = remaining * rewardRate;
-                rewardRate = (reward + leftover) / duration;
+                rewardRate = (_reward + leftover) / _duration;
             }
-            require(reward + leftover <= maxRewardSupply, "not enough tokens");
+            require(_reward + leftover <= maxRewardSupply, "Not enough tokens");
             lastUpdateTime = blockTimestamp;
-            periodFinish = blockTimestamp + duration;
-            emit RewardAdded(reward);
+            periodFinish = blockTimestamp + _duration;
+            emit RewardAdded(_reward);
         }
     }
 

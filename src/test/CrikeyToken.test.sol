@@ -15,6 +15,7 @@ contract CrikeyTokenTest is Test {
         assertEq(testToken.name(), "Crikey Token");
         assertEq(testToken.symbol(), "CRIKEY");
         assertEq(testToken.decimals(), 18);
+        assertEq(testToken.totalSupply(), 100000000 * 10 ** testToken.decimals());
         assertEq(testToken.balanceOf(deployer), 100000000 * 10 ** testToken.decimals());
     }
 }
