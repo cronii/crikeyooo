@@ -61,7 +61,6 @@ contract CrikeyRewards is Owned {
             + userRewards[_account].rewards;
     }
 
-
     modifier updateReward(address _account) {
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = lastTimeRewardApplicable();

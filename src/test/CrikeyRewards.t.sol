@@ -138,6 +138,25 @@ contract CrikeyRewardsTest is Test {
         assertEq(testLpToken.balanceOf(user), 1000);
     }
 
+    function test_FuzzExit(uint120 amount) public {
+        vm.assume(amount > 0);
+        testToken.transfer(address(testRewards), 1000e18);
+        testRewards.setRewardParams(1000e18, 100);
+
+        vm.prank(crocswap);
+        testLpToken.depositCrocLiq(user, poolHash, 0, 0, amount, 0);
+
+        vm.startPrank(user);
+        testLpToken.approve(address(testRewards), amount);
+        testRewards.stake(amount);
+
+        vm.warp(51);
+        testRewards.exit();
+
+        assertApproxEqRel(testToken.balanceOf(user), 500e18, 0.01e18);
+        assertEq(testLpToken.balanceOf(user), amount);
+    }
+
     function test_Earned() public {
         testToken.transfer(address(testRewards), 10000);
         testRewards.setRewardParams(10000, 100);
