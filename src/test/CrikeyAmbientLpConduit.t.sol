@@ -5,19 +5,14 @@ import "forge-std/Test.sol";
 import {CrikeyAmbientLpConduit} from "../CrikeyAmbientLpConduit.sol";
 
 contract CrikeyAmbientLpConduitTest is Test {
-    address owner;
-    address sender;
-    address crocLpContract;
-    bytes32 expectedPoolHash;
-    bytes32 wrongPoolHash;
+    address owner = 0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84;
+    address sender = address(0x1);
+    address crocLpContract = address(0xBEEF);
+    bytes32 expectedPoolHash = 0xf14b97521d2ba8399ee7b9be53ec1eb470416373ed113505baff7e5a63825ced;
+    bytes32 wrongPoolHash = 0xf14b97521d2ba8399ee7b9be53ec1eb470416373ed113505baff7e5a6382DEAD;
     CrikeyAmbientLpConduit testConduit;
 
     function setUp() public {
-        owner = 0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84;
-        sender = address(0x1);
-        crocLpContract = address(0xBEEF);
-        expectedPoolHash = 0xf14b97521d2ba8399ee7b9be53ec1eb470416373ed113505baff7e5a63825ced;
-        wrongPoolHash = 0xf14b97521d2ba8399ee7b9be53ec1eb470416373ed113505baff7e5a6382DEAD;
         testConduit = new CrikeyAmbientLpConduit(crocLpContract, address(0), 0xa6024a169C2fC6BFD0fEabEe150b86d268aAf4CE, 36000);
     }
 

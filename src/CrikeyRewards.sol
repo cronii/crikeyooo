@@ -19,15 +19,15 @@ contract CrikeyRewards is Owned {
     IERC20 public rewardToken;
     IERC20 public stakedToken;
 
-    uint256 public rewardRate;
-    uint64 public periodFinish;
     uint64 public lastUpdateTime;
+    uint64 public periodFinish;
     uint128 public rewardPerTokenStored;
+    uint256 public rewardRate;
     uint256 public totalStaked;
 
     struct UserRewards {
-        uint128 userRewardPerTokenPaid;
         uint128 rewards;
+        uint128 userRewardPerTokenPaid;
     }
 
     mapping(address => uint256) public stakedBalance;
@@ -80,7 +80,7 @@ contract CrikeyRewards is Owned {
         stakeFor(msg.sender, _amount);
     }
 
-    function stakeFor(address forWhom, uint128 _amount) public virtual {
+    function stakeFor(address forWhom, uint128 _amount) public updateReward(msg.sender) {
         require(_amount > 0, "Cannot stake 0");
         require(stakedToken.transferFrom(msg.sender, address(this), _amount), "Insufficient balance");
         unchecked {
