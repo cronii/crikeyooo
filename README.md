@@ -55,13 +55,13 @@ for proof of concept scripts to run, need config.json with the following. both a
 - [x] CrikeyToken contract
 - [x] CrikeyAmbientLpConduit contract
 - [x] Ambient lpConduit proof of concept scripts
-- [ ] CrikeyConcentratedLpConduit contract
-- [ ] Concentrated lpConduit proof of concept scripts
-- [ ] lpConduit contract address security checks
-- [ ] CrikeyRewards contract
+- [ ] CrikeyRangeLpConduit contract
+- [ ] Range lpConduit proof of concept scripts
+- [x] lpConduit contract address security checks
+- [x] CrikeyRewards contract
 - [x] LinearVester contract
 - [ ] FutureRewards contract
-- [ ] Contract tests
+- [x] Contract tests
 - [ ] ETH -> Crikey "Zap"
 - [ ] Frontend
   - [ ] Ambient LP Staking Interface

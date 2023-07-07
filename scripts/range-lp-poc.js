@@ -242,5 +242,3 @@ const { user1 } = CONFIG;
     console.error(err);
   }
 })();
-
-// forge create CrikeyRangeLpConduit --rpc-url=$RPC_URL --private-key=$PRIVATE_KEY --constructor-args 0x0000000000000000000000000000000000000000 0xa6024a169c2fc6bfd0feabee150b86d268aaf4ce 36000
