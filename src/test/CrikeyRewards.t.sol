@@ -18,18 +18,20 @@ contract CrikeyRewardsTest is Test {
 
     function setUp() public {
         testToken = new CrikeyToken("Crikey Token", "CRIKEY", 18);
-        testLpToken = new CrikeyAmbientLpConduit(crocswap, address(0), 0xa6024a169C2fC6BFD0fEabEe150b86d268aAf4CE, 36000);
+        testLpToken =
+            new CrikeyAmbientLpConduit(crocswap, address(0), 0xa6024a169C2fC6BFD0fEabEe150b86d268aAf4CE, 36000);
         testRewards = new CrikeyRewards(IERC20(address(testToken)), IERC20(address(testLpToken)));
     }
 
     function test_SetRewardParams() public {
-        uint128 reward = 10000000;
-        uint64 duration = 1000000;
+        uint128 reward = 10000;
+        uint64 duration = 100;
         uint256 expectedRewardRate = reward / duration;
 
         testToken.transfer(address(testRewards), reward);
         testRewards.setRewardParams(reward, duration);
         assertEq(testRewards.rewardRate(), expectedRewardRate);
+        assertEq(testRewards.periodFinish(), duration + 1);
     }
 
     function test_RejectSetRewardsParamsIfNotOwner() public {
@@ -56,6 +58,7 @@ contract CrikeyRewardsTest is Test {
         testRewards.stake(1000);
 
         assertEq(testLpToken.balanceOf(user), 0);
+        assertEq(testRewards.totalStaked(), 1000);
         assertEq(testLpToken.balanceOf(address(testRewards)), 1000);
     }
 
@@ -96,11 +99,10 @@ contract CrikeyRewardsTest is Test {
         vm.warp(51);
         assertEq(testRewards.earned(user), 5000);
         assertEq(testToken.balanceOf(user), 0);
-        
+
         testRewards.getReward();
         assertEq(testRewards.earned(user), 0);
         assertEq(testToken.balanceOf(user), 5000);
-
     }
 
     function test_Withdraw() public {
@@ -154,11 +156,60 @@ contract CrikeyRewardsTest is Test {
         assertEq(testRewards.earned(user), 10000);
     }
 
-    function test_RewardPerToken() public {
+    function test_LastTimeRewardApplicable() public {
+        testToken.transfer(address(testRewards), 10000);
+        testRewards.setRewardParams(10000, 100);
 
+        assertEq(testRewards.lastTimeRewardApplicable(), 1);
+        vm.warp(51);
+        assertEq(testRewards.lastTimeRewardApplicable(), 51);
+        vm.warp(101);
+        assertEq(testRewards.lastTimeRewardApplicable(), 101);
+        vm.warp(201);
+        assertEq(testRewards.lastTimeRewardApplicable(), 101);
     }
 
-    function test_LastTimeRewardApplicable() public {
+    function test_RewardPerToken() public {
+        assertEq(testRewards.rewardPerToken(), 0);
 
+        testToken.transfer(address(testRewards), 10000);
+        testRewards.setRewardParams(10000, 100);
+
+        vm.prank(crocswap);
+        testLpToken.depositCrocLiq(user, poolHash, 0, 0, 1000, 0);
+
+        vm.startPrank(user);
+        testLpToken.approve(address(testRewards), 1000);
+        testRewards.stake(1000);
+
+        assertEq(testRewards.rewardPerToken(), 0);
+        vm.warp(51);
+        testRewards.getReward();
+        assertEq(testRewards.rewardPerToken(), 5000000000000000000);
+        vm.warp(101);
+        testRewards.getReward();
+        assertEq(testRewards.rewardPerToken(), 10000000000000000000);
+    }
+
+    function test_StakedBalance() public {
+        address user2 = address(0x2);
+        testToken.transfer(address(testRewards), 10000);
+        testRewards.setRewardParams(10000, 100);
+
+        vm.startPrank(crocswap);
+        testLpToken.depositCrocLiq(user, poolHash, 0, 0, 1000, 0);
+        testLpToken.depositCrocLiq(user2, poolHash, 0, 0, 500, 0);
+
+        vm.startPrank(user);
+        testLpToken.approve(address(testRewards), 1000);
+        testRewards.stake(1000);
+
+        vm.startPrank(user2);
+        testLpToken.approve(address(testRewards), 1000);
+        testRewards.stake(500);
+
+        assertEq(testRewards.stakedBalance(user), 1000);
+        assertEq(testRewards.stakedBalance(user2), 500);
+        assertEq(testRewards.totalStaked(), 1500);
     }
 }

@@ -21,13 +21,13 @@ contract CrikeyRewards is Owned {
 
     uint64 public lastUpdateTime;
     uint64 public periodFinish;
-    uint128 public rewardPerTokenStored;
+    uint256 public rewardPerTokenStored;
     uint256 public rewardRate;
     uint256 public totalStaked;
 
     struct UserRewards {
-        uint128 rewards;
-        uint128 userRewardPerTokenPaid;
+        uint256 rewards;
+        uint256 userRewardPerTokenPaid;
     }
 
     mapping(address => uint256) public stakedBalance;
@@ -43,44 +43,40 @@ contract CrikeyRewards is Owned {
         stakedToken = _stakedToken;
     }
 
-    modifier updateReward(address _account) {
-        uint128 _rewardPerTokenStored = rewardPerToken();
-        lastUpdateTime = lastTimeRewardApplicable();
-        rewardPerTokenStored = _rewardPerTokenStored;
-        userRewards[_account].rewards = earned(_account);
-        userRewards[_account].userRewardPerTokenPaid = _rewardPerTokenStored;
-        _;
-    }
-
     function lastTimeRewardApplicable() public view returns (uint64) {
         uint64 blockTimestamp = uint64(block.timestamp);
         return blockTimestamp < periodFinish ? blockTimestamp : periodFinish;
     }
 
-    function rewardPerToken() public view returns (uint128) {
+    function rewardPerToken() public view returns (uint256) {
         if (totalStaked == 0) {
             return rewardPerTokenStored;
         }
-        unchecked {
-            uint256 rewardDuration = lastTimeRewardApplicable() - lastUpdateTime;
-            return uint128(rewardPerTokenStored + rewardDuration * rewardRate * 1e18 / totalStaked);
-        }
+
+        return rewardPerTokenStored + (rewardRate * (lastTimeRewardApplicable() - lastUpdateTime) * 1e18) / totalStaked;
     }
 
-    function earned(address _account) public view returns (uint128) {
-        unchecked {
-            return uint128(
-                stakedBalance[_account] * (rewardPerToken() - userRewards[_account].userRewardPerTokenPaid) / 1e18
-                    + userRewards[_account].rewards
-            );
-        }
+    function earned(address _account) public view returns (uint256) {
+        return ((stakedBalance[_account] * (rewardPerToken() - userRewards[_account].userRewardPerTokenPaid)) / 1e18)
+            + userRewards[_account].rewards;
     }
 
-    function stake(uint128 _amount) external {
+
+    modifier updateReward(address _account) {
+        rewardPerTokenStored = rewardPerToken();
+        lastUpdateTime = lastTimeRewardApplicable();
+
+        userRewards[_account].rewards  = earned(_account);
+        userRewards[_account].userRewardPerTokenPaid = rewardPerTokenStored;
+
+        _;
+    }
+
+    function stake(uint256 _amount) external {
         stakeFor(msg.sender, _amount);
     }
 
-    function stakeFor(address forWhom, uint128 _amount) public updateReward(msg.sender) {
+    function stakeFor(address forWhom, uint256 _amount) public updateReward(msg.sender) {
         require(_amount > 0, "Cannot stake 0");
         require(stakedToken.transferFrom(msg.sender, address(this), _amount), "Insufficient balance");
         unchecked {
@@ -88,21 +84,6 @@ contract CrikeyRewards is Owned {
             stakedBalance[forWhom] += _amount;
         }
         emit Staked(forWhom, _amount);
-    }
-
-    function withdraw(uint128 _amount) public updateReward(msg.sender) {
-        require(_amount <= stakedBalance[msg.sender], "withdraw: balance is lower");
-        unchecked {
-            stakedBalance[msg.sender] -= _amount;
-            totalStaked = totalStaked - _amount;
-        }
-        require(stakedToken.transfer(msg.sender, _amount), "Error transfering reward balance");
-        emit Withdrawn(msg.sender, _amount);
-    }
-
-    function exit() external {
-        getReward();
-        withdraw(uint128(stakedBalance[msg.sender]));
     }
 
     function getReward() public updateReward(msg.sender) {
@@ -114,7 +95,22 @@ contract CrikeyRewards is Owned {
         }
     }
 
-    function setRewardParams(uint128 _reward, uint64 _duration) external onlyOwner {
+    function withdraw(uint256 _amount) public updateReward(msg.sender) {
+        require(_amount <= stakedBalance[msg.sender], "withdraw: balance is lower");
+        unchecked {
+            stakedBalance[msg.sender] -= _amount;
+            totalStaked = totalStaked - _amount;
+        }
+        require(stakedToken.transfer(msg.sender, _amount), "Error transfering reward balance");
+        emit Withdrawn(msg.sender, _amount);
+    }
+
+    function exit() external {
+        getReward();
+        withdraw(stakedBalance[msg.sender]);
+    }
+
+    function setRewardParams(uint256 _reward, uint64 _duration) external onlyOwner {
         unchecked {
             require(_reward > 0);
             rewardPerTokenStored = rewardPerToken();
