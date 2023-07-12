@@ -63,12 +63,7 @@ for proof of concept scripts to run, need config.json with the following. both a
 - [ ] FutureRewards contract
 - [x] Contract tests
 - [ ] ETH -> Crikey "Zap"
-- [ ] Frontend
-  - [ ] Ambient LP Staking Interface
-  - [ ] Concentrated LP Staking Interface
-  - [ ] APY Calculations
-  - [x] Frontend deployment
-  - [x] Vercel
+- [ ] Frontend (https://github.com/cronii/crikeyooo-interface)
 - [ ] Tokenomics
 - [ ] Airdrop distribution plan
 - [ ] Social

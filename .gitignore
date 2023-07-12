@@ -4,3 +4,4 @@ node_modules/
 sample/
 config.json
 .env-*
+deployment.sh
