@@ -75,3 +75,6 @@ for proof of concept scripts to run, need config.json with the following. both a
 - Is there a way to accurately bookkeep for range LP? Should positions be indexed by amount of ETH deposited?
 - What is the best token emmission rate where stakers are not quickly dilluted?
 - What was arbinyan's profit?
+
+## Caveats
+- Because LP's are co-mingled in lpConduit contracts, there is no way(?) to credit and return rewards to individuals. These rewards however will be passively left to increase liquidity
